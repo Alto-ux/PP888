@@ -15,132 +15,9 @@ const STORAGE = {
   leaderboard: "neon_royale_leaderboard"
 };
 
-const DEFAULT_GAMES = [
-  {
-    id: "aztec-cascade",
-    name: "AZTEC CASCADE",
-    icon: "🗿",
-    mode: "REELS",
-    category: "reel",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "temple-wheel",
-    name: "TEMPLE WHEEL",
-    icon: "🎡",
-    mode: "SPECIAL",
-    category: "special",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "golden-cards",
-    name: "GOLDEN CARDS",
-    icon: "🃏",
-    mode: "ARCADE",
-    category: "arcade",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "aztec-dice",
-    name: "AZTEC DICE",
-    icon: "🎲",
-    mode: "SPECIAL",
-    category: "special",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "emerald-match",
-    name: "EMERALD MATCH",
-    icon: "💎",
-    mode: "ARCADE",
-    category: "arcade",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "temple-run",
-    name: "TEMPLE RUN",
-    icon: "🏃",
-    mode: "ARCADE",
-    category: "arcade",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "relic-hunt",
-    name: "RELIC HUNT",
-    icon: "🏺",
-    mode: "SPECIAL",
-    category: "special",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "serpent-memory",
-    name: "SERPENT MEMORY",
-    icon: "🐍",
-    mode: "ARCADE",
-    category: "arcade",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "golden-drop",
-    name: "GOLDEN DROP",
-    icon: "🪙",
-    mode: "ARCADE",
-    category: "arcade",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  },
-  {
-    id: "temple-boss",
-    name: "TEMPLE BOSS",
-    icon: "👹",
-    mode: "SPECIAL",
-    category: "special",
-    config: {
-      min_bet: 1,
-      max_round_cost: 10,
-      bet_step: 1
-    }
-  }
-];
-
 
 /* =========================
-   LOCAL STORAGE
+   STORAGE
 ========================= */
 
 function read(key, fallback) {
@@ -166,15 +43,44 @@ function saveUsers(value) {
 
 function currentSession() {
   const username = localStorage.getItem(STORAGE.session);
+
   if (!username) return null;
 
-  return users().find(x => x.username === username) || null;
+  return users().find(
+    x => x.username === username
+  ) || null;
 }
 
 
 /* =========================
-   DEMO DATABASE
+   DEFAULT GAMES
 ========================= */
+
+const DEFAULT_GAMES = [
+  ["aztec-cascade", "AZTEC CASCADE", "🗿", "REELS", "reel"],
+  ["temple-wheel", "TEMPLE WHEEL", "🎡", "SPECIAL", "special"],
+  ["golden-cards", "GOLDEN CARDS", "🃏", "ARCADE", "arcade"],
+  ["aztec-dice", "AZTEC DICE", "🎲", "SPECIAL", "special"],
+  ["emerald-match", "EMERALD MATCH", "💎", "ARCADE", "arcade"],
+  ["temple-run", "TEMPLE RUN", "🏃", "ARCADE", "arcade"],
+  ["relic-hunt", "RELIC HUNT", "🏺", "SPECIAL", "special"],
+  ["serpent-memory", "SERPENT MEMORY", "🐍", "ARCADE", "arcade"],
+  ["golden-drop", "GOLDEN DROP", "🪙", "ARCADE", "arcade"],
+  ["temple-boss", "TEMPLE BOSS", "👹", "SPECIAL", "special"]
+].map(x => ({
+  id: x[0],
+  name: x[1],
+  icon: x[2],
+  mode: x[3],
+  category: x[4],
+
+  config: {
+    min_bet: 1,
+    max_round_cost: 10,
+    bet_step: 1
+  }
+}));
+
 
 function ensureDemoData() {
   if (!localStorage.getItem(STORAGE.users)) {
@@ -186,34 +92,13 @@ function ensureDemoData() {
   }
 
   if (!localStorage.getItem(STORAGE.leaderboard)) {
-    write(STORAGE.leaderboard, [
-      {
-        name: "AztecHunter",
-        credit: 5000
-      },
-      {
-        name: "TempleKing",
-        credit: 4200
-      },
-      {
-        name: "EmeraldFox",
-        credit: 3500
-      },
-      {
-        name: "GoldenMask",
-        credit: 2800
-      },
-      {
-        name: "JungleRunner",
-        credit: 1900
-      }
-    ]);
+    write(STORAGE.leaderboard, []);
   }
 }
 
 
 /* =========================
-   AUTH
+   AUTH UI
 ========================= */
 
 function showAuth() {
@@ -224,9 +109,13 @@ function showAuth() {
 function showApp() {
   $("#auth").classList.add("hidden");
   $("#app").classList.remove("hidden");
-
   update();
 }
+
+
+/* =========================
+   BOOT
+========================= */
 
 function boot() {
   ensureDemoData();
@@ -244,17 +133,20 @@ function boot() {
 
 
 /* =========================
-   LOGIN / SIGN UP
+   TABS
 ========================= */
 
 document
   .querySelectorAll(".tabs button")
   .forEach(button => {
+
     button.onclick = () => {
 
       document
         .querySelectorAll(".tabs button")
-        .forEach(x => x.classList.remove("active"));
+        .forEach(x =>
+          x.classList.remove("active")
+        );
 
       button.classList.add("active");
 
@@ -273,16 +165,19 @@ document
   });
 
 
+/* =========================
+   LOGIN
+========================= */
+
 $("#login").onsubmit = e => {
   e.preventDefault();
 
-  const data = Object.fromEntries(
-    new FormData(e.target)
-  );
+  const data =
+    Object.fromEntries(
+      new FormData(e.target)
+    );
 
-  const list = users();
-
-  const user = list.find(
+  const user = users().find(
     x =>
       x.username.toLowerCase() ===
         data.username.toLowerCase() &&
@@ -292,7 +187,6 @@ $("#login").onsubmit = e => {
   if (!user) {
     $("#msg").textContent =
       "Invalid username or password";
-
     return;
   }
 
@@ -308,17 +202,21 @@ $("#login").onsubmit = e => {
 };
 
 
+/* =========================
+   SIGN UP
+========================= */
+
 $("#signup").onsubmit = e => {
   e.preventDefault();
 
-  const data = Object.fromEntries(
-    new FormData(e.target)
-  );
+  const data =
+    Object.fromEntries(
+      new FormData(e.target)
+    );
 
   if (data.password.length < 6) {
     $("#msg").textContent =
       "Password must be at least 6 characters";
-
     return;
   }
 
@@ -333,7 +231,6 @@ $("#signup").onsubmit = e => {
   ) {
     $("#msg").textContent =
       "Username already exists";
-
     return;
   }
 
@@ -343,7 +240,7 @@ $("#signup").onsubmit = e => {
     displayName: data.displayName,
     password: data.password,
 
-    // fictional arcade points
+    // fictional arcade credit
     credit: 0,
 
     gamesPlayed: 0,
@@ -366,8 +263,15 @@ $("#signup").onsubmit = e => {
 };
 
 
+/* =========================
+   LOGOUT
+========================= */
+
 $("#logout").onclick = () => {
-  localStorage.removeItem(STORAGE.session);
+
+  localStorage.removeItem(
+    STORAGE.session
+  );
 
   me = null;
 
@@ -376,15 +280,18 @@ $("#logout").onclick = () => {
 
 
 /* =========================
-   PLAYER DATA
+   SAVE CURRENT USER
 ========================= */
 
 function saveCurrentUser() {
+
   const list = users();
 
-  const index = list.findIndex(
-    x => x.username === me.username
-  );
+  const index =
+    list.findIndex(
+      x =>
+        x.username === me.username
+    );
 
   if (index === -1) return;
 
@@ -394,19 +301,25 @@ function saveCurrentUser() {
 }
 
 
+/* =========================
+   PLAYER UPDATE
+========================= */
+
 function update() {
+
   if (!me) return;
 
-  const score = Number(me.credit || 0);
+  const credit =
+    Number(me.credit || 0);
 
   $("#credit").textContent =
-    score.toFixed(2);
+    credit.toFixed(2);
 
   $("#gcredit").textContent =
-    score.toFixed(2);
+    credit.toFixed(2);
 
   $("#stats").innerHTML = [
-    ["CREDIT", score.toFixed(2)],
+    ["CREDIT", credit.toFixed(2)],
     ["PLAYER", me.displayName],
     ["ID", me.id]
   ]
@@ -422,10 +335,11 @@ function update() {
 
 
 /* =========================
-   GAMES
+   LOAD
 ========================= */
 
 function load() {
+
   games = DEFAULT_GAMES;
 
   renderGames();
@@ -433,66 +347,37 @@ function load() {
 }
 
 
-function renderLeaderboard() {
-  const board = read(
-    STORAGE.leaderboard,
-    []
-  );
-
-  const players = [
-    ...board,
-    {
-      name: me?.displayName || "YOU",
-      credit: me?.credit || 0
-    }
-  ];
-
-  players.sort(
-    (a, b) =>
-      Number(b.credit) -
-      Number(a.credit)
-  );
-
-  $("#rank").innerHTML = players
-    .slice(0, 10)
-    .map(
-      (p, i) =>
-        `<tr>
-          <td>#${i + 1}</td>
-          <td>${escapeHTML(p.name)}</td>
-          <td>${Number(p.credit).toFixed(2)} CREDIT</td>
-        </tr>`
-    )
-    .join("");
-}
-
+/* =========================
+   GAMES
+========================= */
 
 function renderGames() {
-  const search =
+
+  const q =
     ($("#search").value || "")
       .toLowerCase()
       .trim();
 
-  const arr = games.filter(game => {
+  const arr =
+    games.filter(game => {
 
-    const categoryOK =
-      cat === "all" ||
-      game.category === cat;
+      const categoryOK =
+        cat === "all" ||
+        game.category === cat;
 
-    const searchOK =
-      !search ||
-      game.name
-        .toLowerCase()
-        .includes(search);
+      const searchOK =
+        !q ||
+        game.name
+          .toLowerCase()
+          .includes(q);
 
-    return categoryOK && searchOK;
-  });
+      return categoryOK && searchOK;
+    });
 
-  $("#grid").innerHTML = arr
-    .map(
+  $("#grid").innerHTML =
+    arr.map(
       game =>
         `<article class="card">
-
           <div class="icon">
             ${game.icon}
           </div>
@@ -511,10 +396,8 @@ function renderGames() {
           >
             PLAY
           </button>
-
         </article>`
-    )
-    .join("");
+    ).join("");
 }
 
 
@@ -544,7 +427,7 @@ document
 
 
 /* =========================
-   GAME
+   OPEN GAME
 ========================= */
 
 function openGame(id) {
@@ -570,7 +453,8 @@ function openGame(id) {
       ${escapeHTML(current.name)}
     </h2>`;
 
-  bet = 1;
+  bet =
+    Number(current.config.min_bet) || 1;
 
   syncBet();
 
@@ -586,10 +470,11 @@ $("#close").onclick = () => {
 
 
 /* =========================
-   REEL DISPLAY
+   SYMBOLS
 ========================= */
 
 function symbols() {
+
   return [
     "🗿",
     "💎",
@@ -631,31 +516,74 @@ function grid() {
 function draw(g = grid()) {
 
   $("#reels").innerHTML =
-    g
-      .map(
-        column =>
-          `<div class="reel">
-            ${column
-              .map(
-                symbol =>
-                  `<div class="cell">
-                    ${symbol}
-                  </div>`
-              )
-              .join("")}
-          </div>`
-      )
-      .join("");
+    g.map(
+      column =>
+        `<div class="reel">
+          ${column
+            .map(
+              symbol =>
+                `<div class="cell">
+                  ${symbol}
+                </div>`
+            )
+            .join("")}
+        </div>`
+    ).join("");
 }
 
 
 /* =========================
-   PLAY
+   SPIN
 ========================= */
 
 $("#spin").onclick = () => {
 
   if (busy) return;
+
+  if (!me) {
+    $("#result").textContent =
+      "Please login first.";
+    return;
+  }
+
+  const credit =
+    Number(me.credit || 0);
+
+  const cost =
+    Number(bet || 0);
+
+  /*
+    IMPORTANT:
+    0 CREDIT cannot play.
+  */
+
+  if (credit <= 0) {
+
+    $("#result").textContent =
+      "CREDIT ไม่พอ";
+
+    return;
+  }
+
+  if (credit < cost) {
+
+    $("#result").textContent =
+      `CREDIT ไม่พอ — ต้องใช้ ${cost.toFixed(2)}`;
+
+    return;
+  }
+
+
+  /* หัก credit ก่อนเริ่มรอบ */
+
+  me.credit =
+    Number(
+      (credit - cost).toFixed(2)
+    );
+
+  saveCurrentUser();
+  update();
+
 
   busy = true;
 
@@ -663,7 +591,8 @@ $("#spin").onclick = () => {
 
   $("#result").textContent = "";
 
-  let count = 0;
+
+  let n = 0;
 
   const finalGrid = grid();
 
@@ -672,74 +601,101 @@ $("#spin").onclick = () => {
 
       draw(grid());
 
-      count++;
+      n++;
 
       if (
-        count >=
+        n >=
         (turbo ? 8 : 18)
       ) {
 
         clearInterval(timer);
 
-        finish(finalGrid);
+        finish(
+          finalGrid,
+          cost
+        );
       }
 
     }, turbo ? 40 : 65);
 };
 
 
-/*
-  Arcade score only.
+/* =========================
+   FINISH
+========================= */
 
-  No cash.
-  No deposits.
-  No withdrawals.
-*/
+function finish(
+  finalGrid,
+  cost
+) {
 
-function finish(finalGrid) {
+  const reward =
+    calculateReward();
 
-  const score = calculateScore();
+
+  /*
+    เพิ่มเฉพาะ reward
+    หลังจากหัก cost ไปแล้ว
+  */
 
   me.credit =
-    Number(me.credit || 0) +
-    score;
+    Number(
+      (
+        Number(me.credit || 0) +
+        reward
+      ).toFixed(2)
+    );
+
 
   me.gamesPlayed =
-    Number(me.gamesPlayed || 0) +
-    1;
+    Number(me.gamesPlayed || 0) + 1;
+
 
   me.bestScore =
     Math.max(
       Number(me.bestScore || 0),
-      score
+      reward
     );
+
 
   me.xp =
     Number(me.xp || 0) +
-    Math.max(1, Math.floor(score / 10));
+    Math.max(
+      1,
+      Math.floor(reward / 10)
+    );
+
 
   saveCurrentUser();
 
+
   addHistory({
     game_id: current.id,
-    score,
+    cost,
+    reward,
     created_at:
       new Date().toISOString()
   });
 
+
   draw(finalGrid);
 
-  if (score > 100) {
+
+  if (reward >= 250) {
+
     $("#result").textContent =
-      `TREASURE! +${score.toFixed(2)} CREDIT`;
+      `TREASURE! +${reward.toFixed(2)} CREDIT`;
+
   } else {
+
     $("#result").textContent =
-      `+${score.toFixed(2)} CREDIT`;
+      `+${reward.toFixed(2)} CREDIT`;
   }
 
-  update();
 
+  update();
   renderLeaderboard();
+
 
   busy = false;
 
@@ -748,10 +704,10 @@ function finish(finalGrid) {
 
 
 /* =========================
-   SCORE
+   REWARD
 ========================= */
 
-function calculateScore() {
+function calculateReward() {
 
   const roll =
     Math.random();
@@ -802,7 +758,7 @@ $("#paytable").onclick = () => {
 250  — Treasure
 500  — Legendary
 
-CREDIT is fictional arcade score only.`
+CREDIT เป็นคะแนนสมมติในเกมเท่านั้น`
   );
 };
 
@@ -834,9 +790,7 @@ $("#history").onclick = () => {
       .reverse()
       .map(
         h =>
-          `${h.game_id} | +${Number(
-            h.score
-          ).toFixed(2)} SCORE`
+          `${h.game_id} | cost ${Number(h.cost).toFixed(2)} | reward ${Number(h.reward).toFixed(2)}`
       )
       .join("\n")
   );
@@ -861,7 +815,52 @@ function addHistory(entry) {
 
 
 /* =========================
-   SCORE DISPLAY CONTROL
+   LEADERBOARD
+========================= */
+
+function renderLeaderboard() {
+
+  const board =
+    read(
+      STORAGE.leaderboard,
+      []
+    );
+
+  const players = [
+    ...board,
+    {
+      name:
+        me?.displayName || "YOU",
+      credit:
+        me?.credit || 0
+    }
+  ];
+
+
+  players.sort(
+    (a, b) =>
+      Number(b.credit) -
+      Number(a.credit)
+  );
+
+
+  $("#rank").innerHTML =
+    players
+      .slice(0, 10)
+      .map(
+        (p, i) =>
+          `<tr>
+            <td>#${i + 1}</td>
+            <td>${escapeHTML(p.name)}</td>
+            <td>${Number(p.credit).toFixed(2)} CREDIT</td>
+          </tr>`
+      )
+      .join("");
+}
+
+
+/* =========================
+   BET / PLAY COST
 ========================= */
 
 function syncBet() {
@@ -870,13 +869,14 @@ function syncBet() {
 
   const min =
     Number(
-      current.config?.min_bet
+      current.config.min_bet
     ) || 1;
 
   const max =
     Number(
-      current.config?.max_round_cost
+      current.config.max_round_cost
     ) || 10;
+
 
   bet =
     Math.min(
@@ -886,6 +886,7 @@ function syncBet() {
         Number(bet.toFixed(2))
       )
     );
+
 
   $("#betValue").textContent =
     bet.toFixed(2);
@@ -898,18 +899,19 @@ function changeBet(direction) {
 
   const min =
     Number(
-      current.config?.min_bet
+      current.config.min_bet
     ) || 1;
 
   const max =
     Number(
-      current.config?.max_round_cost
+      current.config.max_round_cost
     ) || 10;
 
   const step =
     Number(
-      current.config?.bet_step
+      current.config.bet_step
     ) || 1;
+
 
   const next =
     Number(
@@ -919,11 +921,16 @@ function changeBet(direction) {
       ).toFixed(2)
     );
 
+
   bet =
     Math.min(
       max,
-      Math.max(min, next)
+      Math.max(
+        min,
+        next
+      )
     );
+
 
   syncBet();
 }
