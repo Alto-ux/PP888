@@ -1,1 +1,0 @@
-{"name":"neon-royale-online","version":"7.3.0","private":true,"scripts":{"start":"node server.js","dev":"node --watch server.js"},"dependencies":{"bcryptjs":"^2.4.3","better-sqlite3":"^11.7.0","express":"^4.21.2","express-session":"^1.18.1"}}
